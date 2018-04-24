@@ -6,20 +6,31 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 class Converter {
 
     public static void main(String[] args) {
-        String path = "../Geolife Trajectories 1.3/Data/000/Trajectory/20081023025304.plt";
-        File file = new File(path);
+        String path = "../Geolife Trajectories 1.3/Data/";
+        File geoLifeDirectory = new File(path);
 
-        Trajectory t = readTrajectoryFromFile(file);
-        System.out.println("Length: " + t.length() + "\n");
-        List<Place> places = t.getPlaces();
-        for (Place p : places) {
-            System.out.println(p);
+        Dataset d = readDatasetFromGeoLifeDirectory(geoLifeDirectory);
+        System.out.println("Size of the dataset = " + d.size());
+    }
+
+    public static Dataset readDatasetFromGeoLifeDirectory(File directory) {
+        List<File> allFiles = listAllFiles(directory);
+
+        List<File> pltFiles = new LinkedList<File>();
+        for (File f : allFiles) {
+            if (f.getName().endsWith(".plt")) pltFiles.add(f);
         }
+
+        Dataset d = new Dataset();
+        for (File f : pltFiles) d.add(readTrajectoryFromFile(f));
+
+        return d;
     }
 
     public static Trajectory readTrajectoryFromFile(File file) {
@@ -39,7 +50,7 @@ class Converter {
 
             return t;
         } catch (FileNotFoundException e) {
-            System.err.println("Could not find file at path \"" + file.toPath() + "\".");
+            System.err.println("Could not find file at path \"" + file.getName() + "\".");
             System.exit(1);
         } catch (IOException e) {
             System.err.println("An I/O exception occured: " + e.getLocalizedMessage());
@@ -71,6 +82,21 @@ class Converter {
         }
 
         return null;
+    }
+
+    private static List<File> listAllFiles(File directory) {
+        File[] fileArray = directory.listFiles();
+        List<File> fileList = new LinkedList<File>();
+        for (File f : fileArray) fileList.add(f);
+
+        List<File> moreFiles = new LinkedList<File>();
+        for (File f : fileList) {
+            if (f.isDirectory()) moreFiles.addAll(listAllFiles(f));
+        }
+
+        fileList.addAll(moreFiles);
+
+        return fileList;
     }
 
 }
