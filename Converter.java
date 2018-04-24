@@ -6,12 +6,24 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 class Converter {
 
     public static void main(String[] args) {
         String path = "../Geolife Trajectories 1.3/Data/000/Trajectory/20081023025304.plt";
         File file = new File(path);
+
+        Trajectory t = readTrajectoryFromFile(file);
+        System.out.println("Length: " + t.length() + "\n");
+        List<Place> places = t.getPlaces();
+        for (Place p : places) {
+            System.out.println(p);
+        }
+    }
+
+    public static Trajectory readTrajectoryFromFile(File file) {
+        Trajectory t = new Trajectory();
 
         try (BufferedReader r = new BufferedReader(new FileReader(file));) {
             // skip 6 lines at the top of the file
@@ -20,17 +32,21 @@ class Converter {
             String line = r.readLine();
             while (line != null) {
                 Place parsedPlace = readPlaceFromLine(line);
-                System.out.println(line + "\n -> " + parsedPlace);
+                t.add(parsedPlace);
 
                 line = r.readLine();
             }
+
+            return t;
         } catch (FileNotFoundException e) {
-            System.err.println("Could not find file at path \"" + path + "\".");
+            System.err.println("Could not find file at path \"" + file.toPath() + "\".");
             System.exit(1);
         } catch (IOException e) {
             System.err.println("An I/O exception occured: " + e.getLocalizedMessage());
             System.exit(1);
         }
+
+        return null;
     }
 
     public static Place readPlaceFromLine(String line) {
