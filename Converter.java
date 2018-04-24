@@ -11,6 +11,9 @@ class Converter {
         File file = new File(path);
 
         try (BufferedReader r = new BufferedReader(new FileReader(file));) {
+            // skip 6 lines at the top of the file
+            for (int i = 0; i < 6; i++) r.readLine();
+            
             String line = r.readLine();
             while (line != null) {
                 System.out.println(line);
