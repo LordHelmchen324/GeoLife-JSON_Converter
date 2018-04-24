@@ -8,10 +8,6 @@ class Trajectory {
 
     public Trajectory() { }
 
-    public Trajectory(Trajectory original) {
-        for (Place p : original.places) this.add(new Place(p));
-    }
-
     @Override
     public String toString() {
         String s = "[";
@@ -67,71 +63,6 @@ class Trajectory {
             System.exit(1);
         } else {
             this.places.add(i, p);
-        }
-    }
-
-    // Autocorrelation
-
-    private double averageX() {
-        int sum = 0;
-        for (Place p : this.places) {
-            sum += p.getX();
-        }
-    
-        return (double)sum / (double)this.length();
-    }
-
-    private double averageY() {
-        int sum = 0;
-        for (Place p : this.places) {
-            sum += p.getY();
-        }
-    
-        return (double)sum / (double)this.length();
-    }
-
-    private double gammaPrimeA(double h) {
-        int iterCount = this.length() - (int)Math.abs(h);
-        double result = 0.0;
-        for (int i = 0; i < iterCount; i++) {
-            Place place = this.getPlaceAtIndex(i);
-            Place shiftedPlace = this.getPlaceAtIndex(i + (int)Math.abs(h));
-        
-            result += ((double)shiftedPlace.getX() - this.averageX()) * ((double)place.getX() - this.averageX()) + ((double)shiftedPlace.getY() - this.averageY()) * ((double)place.getY() - this.averageY());
-        }
-    
-        return result / (double)this.length();
-    }
-
-    public double autocorrelation(double h) {
-        return this.gammaPrimeA(h) / this.gammaPrimeA(0);
-    }
-
-
-    // others
-
-    public void lengthenToEqualLengthAs(Trajectory other) {
-        if (other.length() == this.length()) return;
-        if (this.length() > other.length()) {
-            System.err.println("Attempted to lengthen Trajectory to length of shorter one!");
-            return;
-        }
-
-        int missingCount = other.length() - this.length();
-
-        for ( ; missingCount > 0; missingCount--) {
-            if ((missingCount & 1) == 0) {  // even: add one at the end
-                Place last = this.places.get(this.length() - 1);
-                this.add(new Place(last.getX(), last.getY(), last.getT() + 1));
-            } else {                        // odd: add at the start if possible, end otherwise
-                Place first = this.places.get(0);
-                if (first.getT() < 1) {
-                    Place last = this.places.get(this.length() - 1);
-                    this.add(new Place(last.getX(), last.getY(), last.getT() + 1));
-                } else {
-                    this.add(new Place(first.getX(), first.getY(), first.getT() - 1));;
-                }
-            }
         }
     }
 

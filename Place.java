@@ -15,14 +15,6 @@ class Place {
         this.t = t;
     }
 
-    public Place(Place original) {
-        this(original.x, original.y, original.t);
-    }
-
-    public static Place makeOrigin() {
-        return new Place(0, 0, 0);
-    }
-
     @Override
     public String toString() {
         return "(" + this.x + "," + this.y + "," + this.t + ")";
@@ -41,20 +33,6 @@ class Place {
     public int getX() { return this.x; }
     public int getY() { return this.y; }
     public int getT() { return this.t; }
-
-    public static class XComparator implements Comparator<Place> {
-        @Override
-        public int compare(Place o1, Place o2) {
-            return o1.getX() - o2.getX();
-        }
-    }
-
-    public static class YComparator implements Comparator<Place> {
-        @Override
-        public int compare(Place o1, Place o2) {
-            return o1.getY() - o2.getY();
-        }
-    }
 
     public static class TComparator implements Comparator<Place> {
         @Override
