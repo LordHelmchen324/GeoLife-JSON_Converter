@@ -73,7 +73,7 @@ class Converter {
             String dateString = items[5] + "," + items[6];
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
             Date date = dateFormat.parse(dateString);
-            int jsonT = (int)(date.getTime() / 1000);  // to the second (UNIX time)
+            int jsonT = (int)(date.getTime() / 100);  // to the thenth of a second (UNIX time * 10)
 
             return new Place(jsonX, jsonY, jsonT);
         } catch (ParseException e) {
