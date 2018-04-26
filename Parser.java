@@ -55,7 +55,7 @@ public class Parser {
                 line = r.readLine();
             }
 
-            System.out.println("Found Trajectory of length " + t.length());
+            System.out.println(" -> Found Trajectory of length " + t.length());
 
             return t;
         } catch (FileNotFoundException e) {
@@ -74,15 +74,15 @@ public class Parser {
 
         double pltX = Double.parseDouble(items[1]);
         double pltY = Double.parseDouble(items[0]);
-
-        int jsonX = (int)(pltX * 10000.0);
-        int jsonY = (int)(pltY * 10000.0);
+        
+        long jsonX = (long)(pltX * 10000.0);
+        long jsonY = (long)(pltY * 10000.0);
 
         try {
             String dateString = items[5] + "," + items[6];
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
             Date date = dateFormat.parse(dateString);
-            int jsonT = (int)(date.getTime() / 100);  // to the thenth of a second (UNIX time * 10)
+            long jsonT = (long)(date.getTime() / 100);  // to the thenth of a second (UNIX time * 10)
 
             return new Place(jsonX, jsonY, jsonT);
         } catch (ParseException e) {

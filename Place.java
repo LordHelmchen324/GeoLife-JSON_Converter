@@ -2,9 +2,9 @@ import java.util.Comparator;
 
 class Place {
 
-    private int x, y, t;
+    private long x, y, t;
 
-    public Place(int x, int y, int t) {
+    public Place(long x, long y, long t) {
         if (t < 0) {
             System.err.println("Illegaly attempted to create Place (" + x + "," + y + "," + t + ") with t < 0 !");
             System.exit(1);
@@ -30,14 +30,14 @@ class Place {
         } else return false;
     }
 
-    public int getX() { return this.x; }
-    public int getY() { return this.y; }
-    public int getT() { return this.t; }
+    public long getX() { return this.x; }
+    public long getY() { return this.y; }
+    public long getT() { return this.t; }
 
     public static class TComparator implements Comparator<Place> {
         @Override
         public int compare(Place o1, Place o2) {
-            return o1.getT() - o2.getT();
+            return (int)(o1.getT() - o2.getT());
         }
     }
 
