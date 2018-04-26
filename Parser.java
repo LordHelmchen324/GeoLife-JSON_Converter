@@ -15,9 +15,14 @@ public class Parser {
 
     public Parser(String readPath) {
         this.readDirectory = new File(readPath);
+        System.out.println("Created Parser for path \"" + this.readDirectory.getAbsolutePath() + "\"\n");
     }
 
     public Dataset parseDataset() {
+        System.out.println("Beginning to parse at path \"" + this.readDirectory.getAbsolutePath() + "\"");
+
+        System.out.print("Listing all files ... ");
+
         List<File> allFiles = listAllFiles(this.readDirectory);
 
         List<File> pltFiles = new LinkedList<File>();
@@ -25,13 +30,17 @@ public class Parser {
             if (f.getName().endsWith(".plt")) pltFiles.add(f);
         }
 
+        System.out.print(pltFiles.size() + " .plt files found\n");
+
         Dataset d = new Dataset();
-        for (File f : pltFiles) d.add(readTrajectoryFromFile(f));
+        for (File f : pltFiles) d.add(parseTrajectoryFromFile(f));
 
         return d;
     }
 
-    private Trajectory readTrajectoryFromFile(File file) {
+    private Trajectory parseTrajectoryFromFile(File file) {
+        System.out.println("Parsing Trajectory from file \"" + file.getAbsolutePath() + "\"");
+
         Trajectory t = new Trajectory();
 
         try (BufferedReader r = new BufferedReader(new FileReader(file));) {
@@ -40,11 +49,13 @@ public class Parser {
 
             String line = r.readLine();
             while (line != null) {
-                Place parsedPlace = readPlaceFromLine(line);
+                Place parsedPlace = parsePlaceFromLine(line);
                 t.add(parsedPlace);
 
                 line = r.readLine();
             }
+
+            System.out.println("Found Trajectory of length " + t.length());
 
             return t;
         } catch (FileNotFoundException e) {
@@ -58,7 +69,7 @@ public class Parser {
         return null;
     }
 
-    private Place readPlaceFromLine(String line) {
+    private Place parsePlaceFromLine(String line) {
         String[] items = line.split(",");
 
         double pltX = Double.parseDouble(items[1]);
