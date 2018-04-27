@@ -34,10 +34,19 @@ class Place {
     public long getY() { return this.y; }
     public long getT() { return this.t; }
 
-    public static class TComparator implements Comparator<Place> {
+    public static class TXYComparator implements Comparator<Place> {
         @Override
         public int compare(Place o1, Place o2) {
-            return (int)(o1.getT() - o2.getT());
+            int compT = (int)(o1.getT() - o2.getT());
+            if (compT != 0) return compT;
+
+            int compX = (int)(o1.getX() - o2.getX());
+            if (compX != 0) return compX;
+
+            int compY = (int)(o1.getY() - o2.getY());
+            if (compY != 0) return compY;
+
+            return 0;
         }
     }
 

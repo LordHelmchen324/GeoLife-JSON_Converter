@@ -47,10 +47,28 @@ public class Parser {
             // skip 6 lines at the top of the file
             for (int i = 0; i < 6; i++) r.readLine();
 
+            List<Place> concurrentPlaces = new LinkedList<Place>();
             String line = r.readLine();
             while (line != null) {
                 Place parsedPlace = parsePlaceFromLine(line);
-                t.add(parsedPlace);
+
+                if (concurrentPlaces.isEmpty() || concurrentPlaces.get(0).getT() == parsedPlace.getT()) {
+                    concurrentPlaces.add(parsedPlace);
+                } else {
+                    if (concurrentPlaces.size() > 1) {
+                        System.out.println("..... concurrent Places: " + concurrentPlaces.size());
+                    }
+                    long time = concurrentPlaces.get(0).getT();
+                    concurrentPlaces.sort(new Place.TXYComparator());
+                    long step = Math.floorDiv(1000, concurrentPlaces.size());
+                    for (int i = 0; i < concurrentPlaces.size(); i++) {
+                        Place p = concurrentPlaces.get(i);
+                        Place corrected = new Place(p.getX(), p.getY(), time + i * step);
+                        t.add(corrected);
+                    }
+                    concurrentPlaces = new LinkedList<Place>();
+                    //if (concurrentPlaces.size() > 1) System.out.println("..... Trajectory: " + t);
+                }
 
                 line = r.readLine();
             }
@@ -82,7 +100,12 @@ public class Parser {
             String dateString = items[5] + "," + items[6];
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
             Date date = dateFormat.parse(dateString);
-            long jsonT = (long)(date.getTime() / 100);  // to the thenth of a second (UNIX time * 10)
+            long jsonT = (long)(date.getTime());  // to the millisecond (UNIX time * 1000)
+
+            if (jsonT < 1175378400000L || jsonT > 1346450399000L) {
+                System.err.println("Time t = " + jsonT + " is outside of the expeced time period!");
+                System.exit(1);
+            }
 
             return new Place(jsonX, jsonY, jsonT);
         } catch (ParseException e) {

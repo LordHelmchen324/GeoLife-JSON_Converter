@@ -6,7 +6,7 @@ public class Converter {
         Parser p = new Parser("../Geolife Trajectories 1.3/Data/");
         Dataset d = p.parseDataset();
 
-        System.out.println("Size of the dataset = " + d.size());
+        System.out.println("\nSize of the dataset = " + d.size() + "\n");
     }
 
 }
