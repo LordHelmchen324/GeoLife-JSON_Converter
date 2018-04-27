@@ -56,16 +56,10 @@ public class Parser {
                     concurrentPlaces.add(parsedPlace);
                 } else {
                     if (concurrentPlaces.size() > 1) {
-                        System.out.println("..... concurrent Places: " + concurrentPlaces.size());
+                        System.out.println(" ..... concurrent Places: " + concurrentPlaces.size());
                     }
-                    long time = concurrentPlaces.get(0).getT();
                     concurrentPlaces.sort(new Place.TXYComparator());
-                    long step = Math.floorDiv(1000, concurrentPlaces.size());
-                    for (int i = 0; i < concurrentPlaces.size(); i++) {
-                        Place p = concurrentPlaces.get(i);
-                        Place corrected = new Place(p.getX(), p.getY(), time + i * step);
-                        t.add(corrected);
-                    }
+                    t.add(concurrentPlaces.get(concurrentPlaces.size() / 2));
                     concurrentPlaces = new LinkedList<Place>();
                     //if (concurrentPlaces.size() > 1) System.out.println("..... Trajectory: " + t);
                 }
