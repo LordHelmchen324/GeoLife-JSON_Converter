@@ -47,19 +47,24 @@ public class Parser {
             // skip 6 lines at the top of the file
             for (int i = 0; i < 6; i++) r.readLine();
 
+            long concurrentPlacesTimestamp = -1;
             List<Place> concurrentPlaces = new LinkedList<Place>();
             String line = r.readLine();
             while (line != null) {
+                long parsedTimestamp = parseTimestampFromLine(line);
                 Place parsedPlace = parsePlaceFromLine(line);
 
-                if (concurrentPlaces.isEmpty() || concurrentPlaces.get(0).getT() == parsedPlace.getT()) {
+                if (concurrentPlaces.isEmpty() || concurrentPlacesTimestamp == parsedTimestamp) {
+                    concurrentPlacesTimestamp = parsedTimestamp;
                     concurrentPlaces.add(parsedPlace);
                 } else {
                     if (concurrentPlaces.size() > 1) {
                         System.out.println(" ..... concurrent Places: " + concurrentPlaces.size());
                     }
-                    concurrentPlaces.sort(new Place.TXYComparator());
-                    t.add(concurrentPlaces.get(concurrentPlaces.size() / 2));
+                    concurrentPlaces.sort(new Place.XYComparator());
+                    t.add(concurrentPlacesTimestamp, concurrentPlaces.get(concurrentPlaces.size() / 2));
+
+                    concurrentPlacesTimestamp = -1;
                     concurrentPlaces = new LinkedList<Place>();
                     //if (concurrentPlaces.size() > 1) System.out.println("..... Trajectory: " + t);
                 }
@@ -90,24 +95,31 @@ public class Parser {
         long jsonX = (long)(pltX * 10000.0);
         long jsonY = (long)(pltY * 10000.0);
 
+        return new Place(jsonX, jsonY);
+    }
+
+    private long parseTimestampFromLine(String line) {
+        String[] items = line.split(",");
+
         try {
             String dateString = items[5] + "," + items[6];
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd,HH:mm:ss");
             Date date = dateFormat.parse(dateString);
             long jsonT = (long)(date.getTime());  // to the millisecond (UNIX time * 1000)
 
+            // Check if the timestamp is within the time period Microsoft claims the data was collected in
             if (jsonT < 1175378400000L || jsonT > 1346450399000L) {
                 System.err.println("Time t = " + jsonT + " is outside of the expeced time period!");
                 System.exit(1);
             }
 
-            return new Place(jsonX, jsonY, jsonT);
+            return jsonT;
         } catch (ParseException e) {
             System.err.println("Could not parse date in the following line of a .plt file:\n  " + line);
             System.exit(1);
         }
 
-        return null;
+        return -1;
     }
 
     private List<File> listAllFiles(File directory) {

@@ -45,4 +45,13 @@ class Place {
         }
     }
 
+    public static class XYComparator implements Comparator<Place> {
+        @Override
+        public int compare(Place o1, Place o2) {
+            long xResult = o1.getX() - o2.getX();
+            if (xResult != 0) return (int)xResult;
+            else return (int)(o1.getY() - o2.getY());
+        }
+    }
+
 }
