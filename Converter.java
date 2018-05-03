@@ -16,18 +16,12 @@ public class Converter {
 
         System.out.println("\nSize of the dataset = " + d.size() + "\n");
 
-        System.out.print("Generating JSON string from Dataset ... ");
-
-        Gson gson = new Gson();
-        String jsonString = gson.toJson(d);
-
-        System.out.print("done!\n\n");
-
         File outputFile = new File("../Geolife Trajectories 1.3/translated.json");
         try (BufferedWriter w = new BufferedWriter(new FileWriter(outputFile))) {
-            System.out.print("Writing JSON string to file at path \"" + outputFile.getAbsolutePath() + "\" ... ");
+            System.out.print("Writing Dataset to JSON file at path \"" + outputFile.getAbsolutePath() + "\" ... ");
 
-            w.write(jsonString);
+            Gson gson = new Gson();
+            gson.toJson(d, w);
 
             System.out.print("done!\n\n");
         } catch (FileNotFoundException e) {
