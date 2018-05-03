@@ -2,11 +2,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.HashMap;
 
 class Trajectory {
 
-    private Map<Long, Place> places = new TreeMap<Long, Place>();
+    private Map<Long, Place> places = new HashMap<Long, Place>();
 
     public Trajectory() { }
 
