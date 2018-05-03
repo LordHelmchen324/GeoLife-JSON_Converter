@@ -1,24 +1,26 @@
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 class Trajectory {
 
-    private List<Place> places = new ArrayList<Place>();
+    private Map<Long, Place> places = new TreeMap<Long, Place>();
 
     public Trajectory() { }
 
+    public Trajectory(Trajectory original) {
+        for (Map.Entry<Long, Place> entry : original.places.entrySet()) {
+            long t = entry.getKey();
+            Place p = new Place(entry.getValue());
+            this.places.put(t, p);
+        }
+    }
+
     @Override
     public String toString() {
-        String s = "[";
-        Iterator<Place> i = this.places.iterator();
-        while (i.hasNext()) {
-            Place p = i.next();
-            s += p.toString();
-            if (i.hasNext()) s += ", ";
-        }
-        s += "]";
-        return s;
+        return this.places.toString();
     }
 
     @Override
@@ -27,11 +29,7 @@ class Trajectory {
 
         if (o instanceof Trajectory) {
             Trajectory t = (Trajectory)o;
-            if (this.length() != t.length()) return false;
-            for (int i = 0; i < this.length(); i++) {
-                if (!this.places.get(i).equals(t.places.get(i))) return false;
-            }
-            return true;
+            return this.places.equals(t.places);
         } else return false;
     }
 
@@ -39,30 +37,92 @@ class Trajectory {
         return this.places.size();
     }
 
-    public Place getPlaceAtIndex(int i) {
-        return places.get(i);
+    public Place getPlaceAtTime(long t) {
+        return this.places.get(t);
+    }
+
+    public List<Long> getTimestamps() {
+        return new ArrayList<Long>(this.places.keySet());
     }
 
     public List<Place> getPlaces() {
-        return this.places;
+        return new ArrayList<Place>(this.places.values());
     }
 
-    public void add(Place p) {
-        if (this.length() == 0) {
-            this.places.add(p);
+    public void add(long t, Place p) {
+        if (t < 0) {
+            System.err.println("Illegaly attempted to add Place (" + p.getX() + "," + p.getY() + ") with t = " + t + " < 0 !");
+        }
+        this.places.put(t, p);
+    }
+
+    // Autocorrelation
+
+    private double averageX() {
+        int sum = 0;
+        for (Place p : this.places.values()) {
+            sum += p.getX();
+        }
+    
+        return (double)sum / (double)this.length();
+    }
+
+    private double averageY() {
+        int sum = 0;
+        for (Place p : this.places.values()) {
+            sum += p.getY();
+        }
+    
+        return (double)sum / (double)this.length();
+    }
+
+    private double gammaPrimeA(double h) {
+        int iterCount = this.length() - (int)Math.abs(h);
+        List<Place> placeValues = new ArrayList<Place>(this.places.values());
+
+        double result = 0.0;
+        for (int i = 0; i < iterCount; i++) {
+            Place place = placeValues.get(i);
+            Place shiftedPlace = placeValues.get(i + (int)Math.abs(h));
+            
+            result += ((double)shiftedPlace.getX() - this.averageX()) * ((double)place.getX() - this.averageX()) + ((double)shiftedPlace.getY() - this.averageY()) * ((double)place.getY() - this.averageY());
+        }
+    
+        return result / (double)this.length();
+    }
+
+    public double autocorrelation(double h) {
+        return this.gammaPrimeA(h) / this.gammaPrimeA(0);
+    }
+
+
+    // others
+
+    public void lengthenToEqualLengthAs(Trajectory other) {
+        if (other.length() == this.length()) return;
+        if (this.length() > other.length()) {
+            System.err.println("Attempted to lengthen Trajectory to length of shorter one!");
             return;
         }
 
-        int i = 0;
-        while (i < this.length() && this.getPlaceAtIndex(i).getT() < p.getT()) i++;
+        int missingCount = other.length() - this.length();
 
-        if (i == this.length()) {
-            this.places.add(p);
-        } else if (this.getPlaceAtIndex(i).getT() == p.getT()) {
-            System.err.println("Illegaly attempted to add Place " + p + " with same t as the Place at index " + i + " to a Trajectory!");
-            System.exit(1);
-        } else {
-            this.places.add(i, p);
+        for ( ; missingCount > 0; missingCount--) {
+            if ((missingCount & 1) == 0) {  // even: add one at the end
+                long lastT = Collections.max(this.places.keySet());
+                Place lastPlace = this.places.get(lastT);
+                this.add(lastT + 1, new Place(lastPlace));
+            } else {                        // odd: add at the start if possible, end otherwise
+                long firstT = Collections.min(this.places.keySet());
+                if (firstT < 1) {
+                    long lastT = Collections.max(this.places.keySet());
+                    Place lastPlace = this.places.get(lastT);
+                    this.add(lastT + 1, new Place(lastPlace));
+                } else {
+                    Place firstPlace = this.places.get(firstT);
+                    this.add(firstT - 1, new Place(firstPlace));
+                }
+            }
         }
     }
 

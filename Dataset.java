@@ -1,3 +1,4 @@
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -6,6 +7,10 @@ class Dataset {
     private List<Trajectory> trajectories = new LinkedList<Trajectory>();
 
     public Dataset() { }
+
+    public Dataset(Dataset original) {
+        for (Trajectory t : original.trajectories) this.add(new Trajectory(t));
+    }
 
     @Override
     public String toString() {
