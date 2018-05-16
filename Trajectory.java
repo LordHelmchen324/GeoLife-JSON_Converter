@@ -1,12 +1,14 @@
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
 
 class Trajectory {
 
     private Map<Long, Place> places = new HashMap<Long, Place>();
+    public int id = -1;
 
     public Trajectory() { }
 
@@ -16,11 +18,12 @@ class Trajectory {
             Place p = new Place(entry.getValue());
             this.places.put(t, p);
         }
+        this.id = original.id;
     }
 
     @Override
     public String toString() {
-        return this.places.toString();
+        return "Trajectory " + this.id + ": " + this.places.toString();
     }
 
     @Override
@@ -28,8 +31,8 @@ class Trajectory {
         if (this == o) return true;
 
         if (o instanceof Trajectory) {
-            Trajectory t = (Trajectory)o;
-            return this.places.equals(t.places);
+            Trajectory r = (Trajectory)o;
+            return this.places.equals(r.places);
         } else return false;
     }
 
@@ -41,8 +44,8 @@ class Trajectory {
         return this.places.get(t);
     }
 
-    public List<Long> getTimestamps() {
-        return new ArrayList<Long>(this.places.keySet());
+    public Set<Long> getTimestamps() {
+        return this.places.keySet();
     }
 
     public List<Place> getPlaces() {
@@ -58,7 +61,7 @@ class Trajectory {
 
     // Autocorrelation
 
-    private double averageX() {
+    public double averageX() {
         int sum = 0;
         for (Place p : this.places.values()) {
             sum += p.getX();
@@ -67,7 +70,7 @@ class Trajectory {
         return (double)sum / (double)this.length();
     }
 
-    private double averageY() {
+    public double averageY() {
         int sum = 0;
         for (Place p : this.places.values()) {
             sum += p.getY();
