@@ -11,12 +11,18 @@ public class Converter {
     public static void main(String[] args) {
         System.out.println("GeoLife to JSON Converter started ...\n");
 
-        Parser p = new Parser("../Geolife Trajectories 1.3/Data Small/");
+        Parser p = new Parser("../Geolife Trajectories 1.3/Data small/");
         Dataset d = p.parseDataset();
 
         System.out.println("\nSize of the dataset = " + d.size() + "\n");
 
-        File outputFile = new File("../Geolife Trajectories 1.3/translated.json");
+        int i = 0;
+        for (Trajectory r : d.getTrajectories()) {
+            r.id = i;
+            i++;
+        }
+
+        File outputFile = new File("../Geolife Trajectories 1.3/MS_GeoLife_small-simple.json");
         try (BufferedWriter w = new BufferedWriter(new FileWriter(outputFile))) {
             System.out.print("Writing Dataset to JSON file at path \"" + outputFile.getAbsolutePath() + "\" ... ");
 
