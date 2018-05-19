@@ -64,13 +64,20 @@ public class Parser {
                     concurrentPlaces.sort(new Place.XYComparator());
                     t.add(concurrentPlacesTimestamp, concurrentPlaces.get(concurrentPlaces.size() / 2));
 
-                    concurrentPlacesTimestamp = -1;
+                    concurrentPlacesTimestamp = parsedTimestamp;
                     concurrentPlaces = new LinkedList<Place>();
+                    concurrentPlaces.add(parsedPlace);
                     //if (concurrentPlaces.size() > 1) System.out.println("..... Trajectory: " + t);
                 }
 
                 line = r.readLine();
             }
+
+            if (concurrentPlaces.size() > 1) {
+                System.out.println(" ..... concurrent Places: " + concurrentPlaces.size());
+            }
+            concurrentPlaces.sort(new Place.XYComparator());
+            t.add(concurrentPlacesTimestamp, concurrentPlaces.get(concurrentPlaces.size() / 2));
 
             System.out.println(" -> Found Trajectory of length " + t.length());
 

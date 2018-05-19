@@ -11,7 +11,7 @@ public class Converter {
     public static void main(String[] args) {
         System.out.println("GeoLife to JSON Converter started ...\n");
 
-        Parser p = new Parser("../Geolife Trajectories 1.3/Data small/");
+        Parser p = new Parser("../Geolife Trajectories 1.3/Data Pandas downsampled/");
         Dataset d = p.parseDataset();
 
         System.out.println("\nSize of the dataset = " + d.size() + "\n");
@@ -22,7 +22,7 @@ public class Converter {
             i++;
         }
 
-        File outputFile = new File("../Geolife Trajectories 1.3/MS_GeoLife_small-simple.json");
+        File outputFile = new File("../Geolife Trajectories 1.3/MS_GeoLife_pandas-downsampled.json");
         try (BufferedWriter w = new BufferedWriter(new FileWriter(outputFile))) {
             System.out.print("Writing Dataset to JSON file at path \"" + outputFile.getAbsolutePath() + "\" ... ");
 
