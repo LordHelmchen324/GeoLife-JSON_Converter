@@ -43,6 +43,11 @@ public class Parser {
 
         Trajectory t = new Trajectory();
 
+        if (Converter.useFileNameIDs) {
+            String fileName = file.getName();
+            t.id = Integer.parseInt(fileName.substring(0, fileName.lastIndexOf(".")));
+        }
+
         try (BufferedReader r = new BufferedReader(new FileReader(file));) {
             // skip 6 lines at the top of the file
             for (int i = 0; i < 6; i++) r.readLine();
