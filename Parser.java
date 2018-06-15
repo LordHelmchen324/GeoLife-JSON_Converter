@@ -99,8 +99,8 @@ public class Parser {
         double pltX = Double.parseDouble(items[1]);
         double pltY = Double.parseDouble(items[0]);
         
-        long jsonX = (long)(pltX * 10000.0);
-        long jsonY = (long)(pltY * 10000.0);
+        long jsonX = (long)(pltX * 100000.0);
+        long jsonY = (long)(pltY * 100000.0);
 
         return new Place(jsonX, jsonY);
     }
